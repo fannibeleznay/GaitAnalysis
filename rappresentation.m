@@ -11,14 +11,17 @@ function rappresentation()
     pointcloud = realsense.pointcloud();
 
     % Start streaming on an arbitrary camera with default settings
-    profile = pipe.start();
+    config = realsense.config();
+    config.enable_stream(realsense.stream.depth,640,480,realsense.format.z16,30);
+    config.enable_stream(realsense.stream.color,640,480,realsense.format.rgb8,30);
+    profile = pipe.start(config);
     
     % Get streaming device's name
     dev = profile.get_device();
     name = dev.get_info(realsense.camera_info.name);
     
     % Initilize Detector
-    detector = posenet.simplePoseEstimator;
+    detector = posenet.PoseEstimator;
   
     figure('visible','on','units','normalized','outerposition',[0 0 1 1]);
     
@@ -62,11 +65,11 @@ function rappresentation()
             
             data = color.get_data();
             img = permute(reshape(data',[3,color.get_width(),color.get_height()]),[3 2 1]);
-            img = imresize(img, [256 192]);
+%             img = imresize(img, [256 192]);
             
             keypoints = detectPose(detector,img);
             J = detector.visualizeKeyPoints(img,keypoints);     
-            J = imresize(J,[480 640]);
+%             J = imresize(J,[480 640]);
             
             % Display image 
             subplot(2,2,2)
