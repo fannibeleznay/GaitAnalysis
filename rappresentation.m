@@ -12,8 +12,6 @@ function rappresentation()
 
     % Start streaming on an arbitrary camera with default settings
     config = realsense.config();
-    config.enable_stream(realsense.stream.depth,640,480,realsense.format.z16,30);
-    config.enable_stream(realsense.stream.color,640,480,realsense.format.rgb8,30);
     profile = pipe.start(config);
     
     % Get streaming device's name
@@ -22,6 +20,7 @@ function rappresentation()
     
     % Initilize Detector
     detector = posenet.PoseEstimator;
+    peopleDetector = peopleDetectorACF;
   
     figure('visible','on','units','normalized','outerposition',[0 0 1 1]);
     
@@ -65,15 +64,24 @@ function rappresentation()
             
             data = color.get_data();
             img = permute(reshape(data',[3,color.get_width(),color.get_height()]),[3 2 1]);
-%             img = imresize(img, [256 192]);
+            [bbox,score] = detect(peopleDetector,img,'SelectStrongest',false);
+            [selectedBbox,~] = selectStrongestBbox(bbox,score,'NumStrongest',1);
+            [croppedImages, croppedBBoxes] = detector.normalizeBBoxes(img,selectedBbox);
+            heatmaps = detector.predict(croppedImages);
+            keypoints = detector.heatmaps2Keypoints(heatmaps);
+            [imgout,joints] = detector.visualizeKeyPointsMultiple(I,keypoints,croppedBBoxes); 
+            dist = zeros(17,3);
+            dist(:,1:2) = joints(:,1:2);
+            for i = 1 : 17
+            dist(i,3) = depth.get_distance(dist(i,1),dist(i,1));
+            end
             
-            keypoints = detectPose(detector,img);
-            J = detector.visualizeKeyPoints(img,keypoints);     
-%             J = imresize(J,[480 640]);
+            radius = zeros(17,1) + 5;
+            imgout = insertObjectAnnotation(imgout,'circle',[dist(:,1:2)' radius'],dist(:,3));
             
             % Display image 
             subplot(2,2,2)
-            imshow(J); 
+            imshow(imgout); 
             title(sprintf("Snapshot from %s", name));
                         
             % Colorize depth frame
