@@ -12,6 +12,8 @@ function rappresentation()
 
     % Start streaming on an arbitrary camera with default settings
     config = realsense.config();
+    config.enable_stream(realsense.stream.depth,1280,720,realsense.format.z16,30);
+    config.enable_stream(realsense.stream.color,1280,720,realsense.format.rgb8,30)
     profile = pipe.start(config);
     
     % Get streaming device's name
@@ -46,41 +48,52 @@ function rappresentation()
             Y = vertices(:,2,1);
             Z = vertices(:,3,1);
 
-            subplot(2,2,[1,3])      
-            plot3(X,Z,-Y,'.');
+            subplot(2,2,2)      
+            plot3(-Y,Z,X,'.');
             grid on
             view([45 30]);
-            % view([0 30]);
 
             xlim([-0.5 0.5])
-            ylim([0.2 1])
-            zlim([-0.5 0.5])
+            ylim([0.5 1.7])
+            zlim([-0.5 2])
 
-            xlabel('X');
+            xlabel('Y');
             ylabel('Z');
-            zlabel('Y');
+            zlabel('X');
             
             % Video Immage     
             
             data = color.get_data();
             img = permute(reshape(data',[3,color.get_width(),color.get_height()]),[3 2 1]);
+            img = imrotate(img,90);
             [bbox,score] = detect(peopleDetector,img,'SelectStrongest',false);
             [selectedBbox,~] = selectStrongestBbox(bbox,score,'NumStrongest',1);
             [croppedImages, croppedBBoxes] = detector.normalizeBBoxes(img,selectedBbox);
-            heatmaps = detector.predict(croppedImages);
-            keypoints = detector.heatmaps2Keypoints(heatmaps);
-            [imgout,joints] = detector.visualizeKeyPointsMultiple(I,keypoints,croppedBBoxes); 
-            dist = zeros(17,3);
-            dist(:,1:2) = joints(:,1:2);
-            for i = 1 : 17
-            dist(i,3) = depth.get_distance(dist(i,1),dist(i,1));
+            % cropped immages must be 256x192x3 uint8
+            if ~isempty(croppedImages)
+                heatmaps = detector.predict(croppedImages);
+                keypoints = detector.heatmaps2Keypoints(heatmaps);
+                [imgout,joints] = detector.visualizeKeyPointsMultiple(img,keypoints,croppedBBoxes); 
+                dist = zeros(4,3);
+                dist(:,1:2) = round(joints(12:15,1:2));
+                
+                if prod(dist(:,2) > 0) 
+                
+                    for i = 1 : 4
+                    dist(i,3) = depth.get_distance(dist(i,1),dist(i,1));
+                    end
+
+                    radius = zeros(4,1) + 5;
+                    imgout = insertObjectAnnotation(imgout,'circle',[dist(:,1:2) radius],dist(:,3),...
+                        'TextBoxOpacity',0.9,'FontSize',30);
+                
+                end
+            else
+                imgout = img;
             end
             
-            radius = zeros(17,1) + 5;
-            imgout = insertObjectAnnotation(imgout,'circle',[dist(:,1:2)' radius'],dist(:,3));
-            
             % Display image 
-            subplot(2,2,2)
+            subplot(2,2,[1,3])
             imshow(imgout); 
             title(sprintf("Snapshot from %s", name));
                         
@@ -91,6 +104,7 @@ function rappresentation()
             % (Color data arrives as [R, G, B, R, G, B, ...] vector)
             datacol = depthcol.get_data();
             imgcol = permute(reshape(datacol',[3,depthcol.get_width(),depthcol.get_height()]),[3 2 1]);
+            imgcol = imrotate(imgcol,90);
 
             % Display image
             subplot(2,2,4)            
