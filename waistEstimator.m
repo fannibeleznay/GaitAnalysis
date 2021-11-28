@@ -44,6 +44,10 @@ function waistEstimator()
             Y = vertices(640*150:640*300,2,1);
             Z = vertices(640*150:640*300,3,1);
             
+%             ptcl = pointCloud([X Z -Y]);
+%             ptclA = pcdownsample(ptcl,'random',0.5);
+%             pcshow(ptclA);
+            
             c = 1;
             count = 1;
             sum = 0;
@@ -57,6 +61,8 @@ function waistEstimator()
                     c = c+1;
                 end
             end
+
+            
             
             mean_dist = sum/count;
 
