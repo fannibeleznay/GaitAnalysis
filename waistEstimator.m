@@ -43,6 +43,22 @@ function waistEstimator()
             X = vertices(640*150:640*300,1,1);
             Y = vertices(640*150:640*300,2,1);
             Z = vertices(640*150:640*300,3,1);
+            
+            c = 1;
+            count = 1;
+            sum = 0;
+            for i = 1 : 25 : 639
+                for j = 150 : 25 : 300
+                    a = depth.get_distance(i,j);
+                    if a < 1.2
+                        sum = sum + a;
+                        count = count + 1;
+                    end
+                    c = c+1;
+                end
+            end
+            
+            mean_dist = sum/count;
 
             subplot(2,2,2)      
             plot3(X,Z,-Y,'.');
@@ -56,6 +72,9 @@ function waistEstimator()
             xlabel('Y');
             ylabel('Z');
             zlabel('X');
+            title(num2str(mean_dist))
+            
+            
             
             % Video Immage     
             
