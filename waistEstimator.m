@@ -37,7 +37,7 @@ function waistEstimator(version)
     end
                   
     % Main loop
-    for iii = 1:10000
+    for iii = 1:10
 
     % Obtain frames from a streaming device
     fs = pipe.wait_for_frames();
@@ -49,7 +49,7 @@ function waistEstimator(version)
     % Produce pointcloud
     if (depth.logical() && color.logical())
 
-        pointcloud.map_to(color);
+        pointcloud.map_to(color); % check what this line does
         points = pointcloud.calculate(depth);
 
         switch version
