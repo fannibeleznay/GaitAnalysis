@@ -94,17 +94,17 @@ classdef depth_view < matlab.apps.AppBase
                 ptcl = pointCloud(vertices(rem(1:height(vertices),30)==0,:)); %0.14
 
                 ptcl_out = pctransform(ptcl,app.tform); %0.06
-                indices = findPointsInROI(ptcl_out,[-0.25 0.25 0.1 0.8 -0.15 0.15]); %0.20
+                indices = findPointsInROI(ptcl_out,[-(320-app.cx1)/1000 (app.cx2-320)/1000 0.1 0.8 -(app.cy2-180)/1000 (180-app.cy1)/1000]); %0.20
                 ptcl_zone = select(ptcl_out,indices); %0.08
                 ptcl_zone.Color = lab2uint8(repmat([128 128 128],ptcl_zone.Count,1));
                 mean_zone = mean(ptcl_zone.Location);
 
-                indices_left = findPointsInROI(ptcl_zone,[ptcl_zone.XLimits(1) ptcl_zone.XLimits(1)+0.05 0.1 0.8 -0.15 0.15]); %0.03
+                indices_left = findPointsInROI(ptcl_zone,[-(320-app.cx1)/1000 -((320-app.cx1)/1000)+0.05  0.1 0.8 -(app.cy2-180)/1000 (180-app.cy1)/1000]); %0.03
                 ptcl_left = select(ptcl_zone,indices_left); %0.006
                 ptcl_left.Color = lab2uint8(repmat([255 0 0],ptcl_left.Count,1)); %0.03
                 mean_left = mean(ptcl_left.Location); %0.02
 
-                indices_right = findPointsInROI(ptcl_zone,[ptcl_zone.XLimits(2)-0.05 ptcl_zone.XLimits(2) 0.1 0.8 -0.15 0.15]); %0.003
+                indices_right = findPointsInROI(ptcl_zone,[((app.cx2-320)/1000)-0.05 (app.cx2-320)/1000 0.1 0.8 -(app.cy2-180)/1000 (180-app.cy1)/1000]); %0.003
                 ptcl_right = select(ptcl_zone,indices_right); %0.02
                 ptcl_right.Color = lab2uint8(repmat([200 0 200],ptcl_right.Count,1)); %0.002
                 mean_right = mean(ptcl_right.Location); %0.0002
@@ -117,7 +117,7 @@ classdef depth_view < matlab.apps.AppBase
 % 
 %                     imagePoints = worldToImage(cameraIntrinsics([intr.fx intr.fy],[intr.ppx intr.ppy],[360 640]),[1 0 0; 0 0 -1; 0 1 0],[0 0 0],ptcl_zone.Location);
                     
-                    app.player = pcplayer([-0.25 0.25], [0.1 0.8], [-0.2 0.2],'Parent',app.PointCloudAX);
+                    app.player = pcplayer([-0.320 0.320], [0.1 0.8], [-0.18 0.18],'Parent',app.PointCloudAX);
                     view(app.player,pccat([ptcl_zone ptcl_right ptcl_left]));
 
                     % Ypos Graph
@@ -177,9 +177,9 @@ classdef depth_view < matlab.apps.AppBase
 
                app.Cfg = realsense.config();
                app.Cfg.enable_stream(realsense.stream.depth,424,240,...
-                    realsense.format.z16,15);
+                    realsense.format.z16,30);
                app.Cfg.enable_stream(realsense.stream.color,424,240,...
-                    realsense.format.rgb8,15)
+                    realsense.format.rgb8,30)
                app.Pipe = realsense.pipeline();
                app.Colorizer = realsense.colorizer();
                app.PointCloud = realsense.pointcloud();
@@ -187,7 +187,7 @@ classdef depth_view < matlab.apps.AppBase
 
                % Create timer object
 
-               kFramePerSecond = 15.0;                                  % Number of frames per second
+               kFramePerSecond = 30.0;                                  % Number of frames per second
                Period = double(int64(1000.0 / kFramePerSecond))/1000.0+0.001; % Frame Rate
                
                
@@ -216,49 +216,49 @@ classdef depth_view < matlab.apps.AppBase
         
         function onUp1(app, event)            
             
-            app.cy1 = app.cy1 - 5;
+            app.cy1 = app.cy1 - 2;
                                
         end
         
         function onUp2(app, event)
             
-            app.cy2 = app.cy2 - 5;
+            app.cy2 = app.cy2 - 2;
                       
         end
         
         function onDown1(app, event)
             
-            app.cy1 = app.cy1 + 5;
+            app.cy1 = app.cy1 + 2;
             
         end
         
         function onDown2(app, event)
             
-            app.cy2 = app.cy2 + 5;
+            app.cy2 = app.cy2 + 2;
             
         end
         
         function onRight1(app, event)
             
-            app.cx1 = app.cx1 + 5;
+            app.cx1 = app.cx1 + 2;
             
         end
         
         function onRight2(app, event)
             
-            app.cx2 = app.cx2 + 5;
+            app.cx2 = app.cx2 + 2;
             
         end
         
         function onLeft1(app, event)
             
-            app.cx1 = app.cx1 - 5;
+            app.cx1 = app.cx1 - 2;
             
         end
         
         function onLeft2(app, event)
             
-            app.cx2 = app.cx2 - 5;
+            app.cx2 = app.cx2 - 2;
             
         end
 
@@ -342,8 +342,7 @@ classdef depth_view < matlab.apps.AppBase
             app.Up1.Position = [670 750 50 20];
             app.Up1.Text = 'Up';
             app.Up1.FontColor = 'green';
-            app.cy1 = 100; 
-            
+            app.cy1 = 90; 
             
             % Create Up2
             app.Up2 = uibutton(app.UIFigure, 'push');
@@ -352,7 +351,7 @@ classdef depth_view < matlab.apps.AppBase
             app.Up2.Position = [730 750 50 20];
             app.Up2.Text = 'Up';
             app.Up2.FontColor = 'red';
-            app.cy2 = 260;
+            app.cy2 = 270;
             
             % Create Down1
             app.Down1 = uibutton(app.UIFigure, 'push');
@@ -377,7 +376,7 @@ classdef depth_view < matlab.apps.AppBase
             app.Right1.Position = [730 670 50 20];
             app.Right1.Text = 'Right';
             app.Right1.FontColor = 'cyan';
-            app.cx1 = 120;
+            app.cx1 = 160;
             
             % Create Right2
             app.Right2 = uibutton(app.UIFigure, 'push');
@@ -386,7 +385,7 @@ classdef depth_view < matlab.apps.AppBase
             app.Right2.Position = [730 640 50 20];
             app.Right2.Text = 'Right';
             app.Right2.FontColor = 'magenta';
-            app.cx2 = 520;
+            app.cx2 = 480;
             
             % Create Left1
             app.Left1 = uibutton(app.UIFigure, 'push');
