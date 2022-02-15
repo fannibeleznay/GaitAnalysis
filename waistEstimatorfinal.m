@@ -10,9 +10,9 @@ function waistEstimatorfinal
     % Start streaming on an arbitrary camera with default settings
     config = realsense.config();
     config.enable_stream(realsense.stream.depth,640,360,...
-        realsense.format.z16,60);
+        realsense.format.z16,30);
     config.enable_stream(realsense.stream.color,640,360,...
-        realsense.format.rgb8,60) % 0.07
+        realsense.format.rgb8,30) % 0.07
     
     pipe.start(config); %0.65
     
@@ -88,7 +88,7 @@ function waistEstimatorfinal
 %             ptcl_display_r = pointCloud(vertices(rem(1:height(vertices),5)==0,:));
 %             ptcl_display = pctransform(ptcl_display_r,tform); %0.06
 %             ptcl_display.Color = lab2uint8(repmat([128 128 128],ptcl_display.Count,1));
-            ptcl = pointCloud(vertices(rem(1:height(vertices),15)==0,:)); %0.14
+            ptcl = pointCloud(vertices(rem(1:height(vertices),30)==0,:)); %0.14
 
             ptcl_out = pctransform(ptcl,tform); %0.06
             indices = findPointsInROI(ptcl_out,[-0.25 0.25 range -0.1 0.15]); %0.20
@@ -137,26 +137,26 @@ function waistEstimatorfinal
             addpoints(li_x,toc,mean_zone(1));
             drawnow limitrate
             subplot(3,1,1)
-            legend(num2str(mean_zone(1)))
-            xlim([toc-10 toc+10])        
-            %subtitle(['X position =' num2str(mean_zone(1))])
+            subtitle(['X position = ' num2str(mean_zone(1))])
+            xlim([toc-10 toc+10]) 
+            ylabel('x [m]')
+            
             
             addpoints(li_y,toc,mean_zone(2)); 
             drawnow limitrate
             subplot(3,1,2)
-            legend(num2str(mean_zone(2)))
+            subtitle(['Y position = ' num2str(mean_zone(2))])
             xlim([toc-10 toc+10])
-            
-            %subtitle(['Y position =' num2str(mean_zone(2))])
+            ylabel('y [m]')
             
             addpoints(li_th,toc,angle);
             drawnow limitrate
             subplot(3,1,3)
-            legend(num2str(angle))
-            xlim([toc-10 toc+10])
-            
-            
-            %subtitle(['Angle position =' num2str(angle)])
+            subtitle('Angle position')
+            subtitle(['Angle position = ' num2str(angle)])
+            xlim([toc-10 toc+10])  
+            xlabel('t [s]')
+            ylabel('\theta [°]')
             
             range = [mean_zone(2)-0.15 mean_zone(2)+0.15];
                       

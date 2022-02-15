@@ -126,7 +126,7 @@ classdef depth_view < matlab.apps.AppBase
                     addpoints(app.li_y,toc,mean_zone(2));
                     drawnow limitrate
                     app.YposAX.XLim = [toc-10 toc+10];
-                    app.YposAX.YLim = [0.1 0.8];
+                    
 
                     % THpos Graph
 
@@ -134,7 +134,7 @@ classdef depth_view < matlab.apps.AppBase
                     addpoints(app.li_th,toc,0);
                     drawnow limitrate
                     app.THposAX.XLim = [toc-10 toc+10];
-                    app.THposAX.YLim = [-45 45];
+                    
 
                 elseif length(mean_left) == 3 && length(mean_right) == 3
                     
@@ -145,21 +145,23 @@ classdef depth_view < matlab.apps.AppBase
                     ptcl_line.Color = lab2uint8(repmat([255 255 0],ptcl_line.Count,1)); %0.001
 
                     view(app.player,pccat([ptcl_zone ptcl_line ptcl_right ptcl_left]));
-                    app.player.Axes.Title.String = num2str(real(asind((mean_left(2)-mean_right(2))/(mean_left(1)-mean_right(1)))));
 
                     % Ypos Graph
 
                     addpoints(app.li_y,toc,mean_zone(2));
                     drawnow limitrate
-                    app.YposAX.XLim = [toc-10 toc+10];
-                    app.YposAX.YLim = [0.1 0.8];   
+                    app.YposAX.XLim = [toc-10 toc+10]; 
+                    app.YposAX.Title.String = ['Y Position = ' num2str(mean_zone(2))];
+%                     app.YposAX.Legend.Title.String = num2str(mean_zone(2));
 
                     % THpos Graph
 
-                    addpoints(app.li_th,toc,real(asind((mean_left(2)-mean_right(2))/(mean_left(1)-mean_right(1)))));
+                    angle = real(asind((mean_left(2)-mean_right(2))/(mean_left(1)-mean_right(1))));
+                    addpoints(app.li_th,toc, angle);
                     drawnow limitrate
                     app.THposAX.XLim = [toc-10 toc+10];
-                    app.THposAX.YLim = [-45 45];
+                    app.THposAX.Title.String = ['Angle Position = ' num2str(angle)];
+%                     app.THposAX.Legend.Title.String = num2str(angle);
 
                 end
             end
@@ -308,6 +310,15 @@ classdef depth_view < matlab.apps.AppBase
             app.YposAX.XGrid = 'on';
             app.YposAX.YGrid = 'on';
             app.YposAX.GridColor = 'w';
+            app.YposAX.Title.String = 'Y Position';
+            app.YposAX.Title.Color = [1 1 1];
+            app.YposAX.YLabel.String = 'y [m]';
+            app.YposAX.YLabel.Color = [1 1 1];
+            app.YposAX.YLim = [0.1 0.8];
+%             legend(app.YposAX);
+%             app.YposAX.Legend.Title.Color = [1 1 1];
+            
+            
             
             
             % Create THposAX
@@ -319,6 +330,15 @@ classdef depth_view < matlab.apps.AppBase
             app.THposAX.XGrid = 'on';
             app.THposAX.YGrid = 'on';
             app.THposAX.GridColor = 'w';
+            app.THposAX.Title.String = 'Angle Position';
+            app.THposAX.Title.Color = [1 1 1];
+            app.THposAX.XLabel.String = 't [s]';
+            app.THposAX.XLabel.Color = [1 1 1];
+            app.THposAX.YLabel.String = '\theta [°]';
+            app.THposAX.YLabel.Color = [1 1 1];
+            app.THposAX.YLim = [-45 45];
+%             legend(app.THposAX);
+%             app.THposAX.Legend.Title.Color = [1 1 1];
             
             
             % Create PointCloudAX
@@ -327,6 +347,9 @@ classdef depth_view < matlab.apps.AppBase
             app.PointCloudAX.XLim = [-0.5 0.5];
             app.PointCloudAX.YLim = [0.1 0.8];
             app.PointCloudAX.ZLim = [-0.5 1.2];
+            app.PointCloudAX.Title.String = 'Point Cloud';
+            app.PointCloudAX.Title.Color = [1 1 1];
+            
 
             % Create StartButton
             app.StartButton = uibutton(app.UIFigure, 'push');
