@@ -1,6 +1,7 @@
 function waistEstimator_automatic
     close all
     clc
+    
     % Make Pipeline object to manage streaming
     pipe = realsense.pipeline(); %0.07
     
@@ -48,7 +49,7 @@ function waistEstimator_automatic
 
     fs = pipe.wait_for_frames(); %0.42
         
-    % Divide in Depth and Color Fram
+    %Depth Frame
     depth = fs.get_depth_frame(); %0.005
 
     flag = 0;
@@ -89,7 +90,6 @@ function waistEstimator_automatic
         if depth.logical()
             
             points = pointcloud.calculate(depth); %0.065  
-
             vertices = points.get_vertices(); %0.001
             ptcl = pointCloud(vertices(rem(1:height(vertices),15)==0,:)); %0.14
 
@@ -99,18 +99,21 @@ function waistEstimator_automatic
             ptcl_zone.Color = lab2uint8(repmat([128 128 128],ptcl_zone.Count,1));
             mean_zone = mean(ptcl_zone.Location);
             
-            indices_base = findPointsInROI(ptcl_zone,[ptcl_zone.XLimits(1) ptcl_zone.XLimits(2) range mean_zone(3)+0.02 mean_zone(3)+0.07]);
+            indices_base = findPointsInROI(ptcl_zone,[ptcl_zone.XLimits(1)...
+                ptcl_zone.XLimits(2) range mean_zone(3)+0.02 mean_zone(3)+0.07]);
             ptcl_base = select(ptcl_zone,indices_base); %0.006
             
             ptcl_zone_mean = pointCloud(([x(:),y(:),z(:)]*0.005)+[mean_zone(1) mean_zone(2) mean_zone(3)]);
             ptcl_zone_mean.Color = lab2uint8(repmat([0 255 0],ptcl_zone_mean.Count,1)); %0.001
             
-            indices_left = findPointsInROI(ptcl_zone,[ptcl_base.XLimits(1) ptcl_base.XLimits(1)+0.05 range mean_zone(3)+0.02 mean_zone(3)+0.07]); %0.03
+            indices_left = findPointsInROI(ptcl_zone,[ptcl_base.XLimits(1)...
+                ptcl_base.XLimits(1)+0.05 range mean_zone(3)+0.02 mean_zone(3)+0.07]); %0.03
             ptcl_left = select(ptcl_zone,indices_left); %0.006
             ptcl_left.Color = lab2uint8(repmat([255 0 0],ptcl_left.Count,1)); %0.03
             mean_left = mean(ptcl_left.Location); %0.02
 
-            indices_right = findPointsInROI(ptcl_zone,[ptcl_base.XLimits(2)-0.05 ptcl_base.XLimits(2) range mean_zone(3)+0.02 mean_zone(3)+0.07]); %0.003
+            indices_right = findPointsInROI(ptcl_zone,[ptcl_base.XLimits(2)-0.05 ...
+                ptcl_base.XLimits(2) range mean_zone(3)+0.02 mean_zone(3)+0.07]); %0.003
             ptcl_right = select(ptcl_zone,indices_right); %0.02
             ptcl_right.Color = lab2uint8(repmat([200 0 200],ptcl_right.Count,1)); %0.002
             mean_right = mean(ptcl_right.Location); %0.0002
