@@ -89,25 +89,25 @@ classdef depth_view < matlab.apps.AppBase
 
             if depth_frame.logical()
 
-                points = app.PointCloud.calculate(depth_frame); %0.065            
-                vertices = points.get_vertices(); %0.001
-                ptcl = pointCloud(vertices(rem(1:height(vertices),30)==0,:)); %0.14
+                points = app.PointCloud.calculate(depth_frame);           
+                vertices = points.get_vertices();
+                ptcl = pointCloud(vertices(rem(1:height(vertices),30)==0,:));
 
-                ptcl_out = pctransform(ptcl,app.tform); %0.06
-                indices = findPointsInROI(ptcl_out,[-(320-app.cx1)/1000 (app.cx2-320)/1000 0.1 0.8 -(app.cy2-180)/1000 (180-app.cy1)/1000]); %0.20
-                ptcl_zone = select(ptcl_out,indices); %0.08
+                ptcl_out = pctransform(ptcl,app.tform);
+                indices = findPointsInROI(ptcl_out,[-(320-app.cx1)/1000 (app.cx2-320)/1000 0.1 0.8 -(app.cy2-180)/1000 (180-app.cy1)/1000]);
+                ptcl_zone = select(ptcl_out,indices);
                 ptcl_zone.Color = lab2uint8(repmat([128 128 128],ptcl_zone.Count,1));
                 mean_zone = mean(ptcl_zone.Location);
 
-                indices_left = findPointsInROI(ptcl_zone,[-(320-app.cx1)/1000 -((320-app.cx1)/1000)+0.05  0.1 0.8 -(app.cy2-180)/1000 (180-app.cy1)/1000]); %0.03
-                ptcl_left = select(ptcl_zone,indices_left); %0.006
-                ptcl_left.Color = lab2uint8(repmat([255 0 0],ptcl_left.Count,1)); %0.03
-                mean_left = mean(ptcl_left.Location); %0.02
+                indices_left = findPointsInROI(ptcl_zone,[-(320-app.cx1)/1000 -((320-app.cx1)/1000)+0.05  0.1 0.8 -(app.cy2-180)/1000 (180-app.cy1)/1000]);
+                ptcl_left = select(ptcl_zone,indices_left);
+                ptcl_left.Color = lab2uint8(repmat([255 0 0],ptcl_left.Count,1));
+                mean_left = mean(ptcl_left.Location);
 
-                indices_right = findPointsInROI(ptcl_zone,[((app.cx2-320)/1000)-0.05 (app.cx2-320)/1000 0.1 0.8 -(app.cy2-180)/1000 (180-app.cy1)/1000]); %0.003
-                ptcl_right = select(ptcl_zone,indices_right); %0.02
-                ptcl_right.Color = lab2uint8(repmat([200 0 200],ptcl_right.Count,1)); %0.002
-                mean_right = mean(ptcl_right.Location); %0.0002
+                indices_right = findPointsInROI(ptcl_zone,[((app.cx2-320)/1000)-0.05 (app.cx2-320)/1000 0.1 0.8 -(app.cy2-180)/1000 (180-app.cy1)/1000]);
+                ptcl_right = select(ptcl_zone,indices_right);
+                ptcl_right.Color = lab2uint8(repmat([200 0 200],ptcl_right.Count,1));
+                mean_right = mean(ptcl_right.Location);
 
                 if ki*kj < 1
                     
@@ -138,11 +138,11 @@ classdef depth_view < matlab.apps.AppBase
 
                 elseif length(mean_left) == 3 && length(mean_right) == 3
                     
-                    u = (mean_left-mean_right)/norm(mean_left-mean_right); %0.001
-                    line = mean_right + (0:0.0005:norm(mean_left-mean_right))'*u; %0.001 
+                    u = (mean_left-mean_right)/norm(mean_left-mean_right);
+                    line = mean_right + (0:0.0005:norm(mean_left-mean_right))'*u; 
                     
-                    ptcl_line = pointCloud(line); %0.004
-                    ptcl_line.Color = lab2uint8(repmat([255 255 0],ptcl_line.Count,1)); %0.001
+                    ptcl_line = pointCloud(line); 
+                    ptcl_line.Color = lab2uint8(repmat([255 255 0],ptcl_line.Count,1)); 
 
                     view(app.player,pccat([ptcl_zone ptcl_line ptcl_right ptcl_left]));
 

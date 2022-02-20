@@ -45,11 +45,13 @@ function waistEstimator_automatic
     
     subplot(4,1,3)
     grid on
+    yline(35,'r')
     ylim([-30 60])
     li_th_r = animatedline(gca);
     
     subplot(4,1,4)
     grid on
+    yline(35,'r')
     ylim([-30 60])
     li_th_l = animatedline(gca);
 
@@ -124,20 +126,20 @@ function waistEstimator_automatic
             mean_right = mean(ptcl_right.Location);
             
             indices_left_hip = findPointsInROI(ptcl_zone,[ptcl_base.XLimits(1)...
-                ptcl_base.XLimits(1)+0.05 range mean_zone(3)-0.05 mean_zone(3)]);
+                ptcl_base.XLimits(1)+0.05 range mean_zone(3)-0.15 mean_zone(3)-0.10]);
             ptcl_left_hip = select(ptcl_zone,indices_left_hip);
             ptcl_left_hip.Color = lab2uint8(repmat([0 0 255],ptcl_left_hip.Count,1)); %blue
             mean_left_hip = mean(ptcl_left_hip.Location);
             
             indices_right_hip = findPointsInROI(ptcl_zone,[ptcl_base.XLimits(2)-0.05 ...
-                ptcl_base.XLimits(2) range mean_zone(3)-0.05 mean_zone(3)]);
+                ptcl_base.XLimits(2) range mean_zone(3)-0.15 mean_zone(3)-0.10]);
             ptcl_right_hip = select(ptcl_zone,indices_right_hip);
             ptcl_right_hip.Color = lab2uint8(repmat([0 0 0],ptcl_right_hip.Count,1)); %acqua
             mean_right_hip = mean(ptcl_right_hip.Location);
             
             mean_lrtotal = (mean_right+mean_left)/2;
     
-            if length(mean_left) == 3 && length(mean_right) == 3 
+            if length(mean_left) == 3 && length(mean_right) == 3  && length(mean_left_hip) == 3 && length(mean_right_hip) == 3 
                 
                 ptcl_left_mean = pointCloud(([x(:),y(:),z(:)]*0.005)+[mean_left(1) mean_left(2) mean_left(3)]);
                 ptcl_left_mean.Color = lab2uint8(repmat([255 0 0],ptcl_left_mean.Count,1));
@@ -182,13 +184,13 @@ function waistEstimator_automatic
                                    ptcl_right ptcl_right_mean ptcl_right_hip ptcl_right_hip_mean ptcl_line_r ...
                                    ptcl_left ptcl_left_mean ptcl_left_hip ptcl_left_hip_mean ptcl_line_l]));
                 
-                if angle_r > 30
-                    title.String = 'Right HS-TO';
-                elseif angle_l > 30
-                    title.String = 'Left HS-TO';
-                else
-                    title.String = '';
-                end
+%                 if angle_r > 30
+%                     title.String = 'Right HS-TO';
+%                 elseif angle_l > 30
+%                     title.String = 'Left HS-TO';
+%                 else
+%                     title.String = '';
+%                 end
 
                 addpoints(li_y,toc,mean_zone(1));
                 drawnow limitrate
@@ -207,7 +209,7 @@ function waistEstimator_automatic
                 xlabel('t [s]')
                 ylabel('\theta [°]')
                 
-                addpoints(li_th_r,toc,angle);
+                addpoints(li_th_r,toc,angle_r);
                 drawnow limitrate
                 subplot(4,1,3)
                 subtitle(['Right hip position = ' num2str(angle_r)])
@@ -215,7 +217,7 @@ function waistEstimator_automatic
                 xlabel('t [s]')
                 ylabel('\theta [°]')
                 
-                addpoints(li_th_l,toc,angle);
+                addpoints(li_th_l,toc,angle_l);
                 drawnow limitrate
                 subplot(4,1,4)
                 subtitle(['Left hip position = ' num2str(angle_l)])
