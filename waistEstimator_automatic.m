@@ -30,7 +30,6 @@ function waistEstimator_automatic
     tform = rigid3d([1 0 0; 0 0 -1; 0 1 0],[0 0 0]);
       
     player = pcplayer([-0.25 0.25], [0.1 0.8], [-0.2 0.2]);
-    title = player.Axes.Title;
     
     figure(2);
     subplot(4,1,1)
@@ -45,13 +44,11 @@ function waistEstimator_automatic
     
     subplot(4,1,3)
     grid on
-    yline(35,'r')
     ylim([-30 60])
     li_th_r = animatedline(gca);
     
     subplot(4,1,4)
     grid on
-    yline(35,'r')
     ylim([-30 60])
     li_th_l = animatedline(gca);
 
@@ -113,26 +110,27 @@ function waistEstimator_automatic
             ptcl_zone_mean = pointCloud(([x(:),y(:),z(:)]*0.005)+[mean_zone(1) mean_zone(2) mean_zone(3)]);
             ptcl_zone_mean.Color = lab2uint8(repmat([0 255 0],ptcl_zone_mean.Count,1)); %green
             
-            indices_left = findPointsInROI(ptcl_zone,[ptcl_base.XLimits(1)...
-                ptcl_base.XLimits(1)+0.05 range mean_zone(3)+0.02 mean_zone(3)+0.07]);
+            indices_left = findPointsInROI(ptcl_zone,[ptcl_base.XLimits(1)+0.02...
+                ptcl_base.XLimits(1)+0.07 range mean_zone(3)+0.02 mean_zone(3)+0.07]);
             ptcl_left = select(ptcl_zone,indices_left);
             ptcl_left.Color = lab2uint8(repmat([255 0 0],ptcl_left.Count,1)); %red
             mean_left = mean(ptcl_left.Location);
 
-            indices_right = findPointsInROI(ptcl_zone,[ptcl_base.XLimits(2)-0.05 ...
-                ptcl_base.XLimits(2) range mean_zone(3)+0.02 mean_zone(3)+0.07]);
+            indices_right = findPointsInROI(ptcl_zone,[ptcl_base.XLimits(2)-0.07 ...
+                ptcl_base.XLimits(2)-0.02 range mean_zone(3)+0.02 mean_zone(3)+0.07]);
             ptcl_right = select(ptcl_zone,indices_right);
             ptcl_right.Color = lab2uint8(repmat([200 0 200],ptcl_right.Count,1)); %magenta
             mean_right = mean(ptcl_right.Location);
+      
             
-            indices_left_hip = findPointsInROI(ptcl_zone,[ptcl_base.XLimits(1)...
-                ptcl_base.XLimits(1)+0.05 range mean_zone(3)-0.15 mean_zone(3)-0.10]);
+            indices_left_hip = findPointsInROI(ptcl_zone,[ptcl_base.XLimits(1)+0.02...
+                ptcl_base.XLimits(1)+0.07 range mean_zone(3)-0.15 mean_zone(3)-0.10]);
             ptcl_left_hip = select(ptcl_zone,indices_left_hip);
             ptcl_left_hip.Color = lab2uint8(repmat([0 0 255],ptcl_left_hip.Count,1)); %blue
             mean_left_hip = mean(ptcl_left_hip.Location);
             
-            indices_right_hip = findPointsInROI(ptcl_zone,[ptcl_base.XLimits(2)-0.05 ...
-                ptcl_base.XLimits(2) range mean_zone(3)-0.15 mean_zone(3)-0.10]);
+            indices_right_hip = findPointsInROI(ptcl_zone,[ptcl_base.XLimits(2)-0.07 ...
+                ptcl_base.XLimits(2)-0.02 range mean_zone(3)-0.15 mean_zone(3)-0.10]);
             ptcl_right_hip = select(ptcl_zone,indices_right_hip);
             ptcl_right_hip.Color = lab2uint8(repmat([0 0 0],ptcl_right_hip.Count,1)); %acqua
             mean_right_hip = mean(ptcl_right_hip.Location);
@@ -183,6 +181,10 @@ function waistEstimator_automatic
                 view(player,pccat([ptcl_zone ptcl_zone_mean ptcl_line ptcl_lrtotal_mean ...
                                    ptcl_right ptcl_right_mean ptcl_right_hip ptcl_right_hip_mean ptcl_line_r ...
                                    ptcl_left ptcl_left_mean ptcl_left_hip ptcl_left_hip_mean ptcl_line_l]));
+                               
+%                view(player,pccat([ptcl_zone ptcl_zone_mean ptcl_line ...
+%                                    ptcl_right ptcl_right_hip ptcl_line_r ...
+%                                    ptcl_left ptcl_left_hip ptcl_line_l]));
                 
 %                 if angle_r > 30
 %                     title.String = 'Right HS-TO';
